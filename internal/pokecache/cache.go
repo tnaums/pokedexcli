@@ -17,6 +17,7 @@ type Cache struct {
 
 func NewCache(interval time.Duration) Cache {
 	return Cache{
-		pokeCache: make(map[string]cacheEntry)
-		mux: sync.Mutex()
+		pokeCache: make(map[string]cacheEntry),
+		mux: sync.Mutex{},
 	}
+}

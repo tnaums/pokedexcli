@@ -15,3 +15,8 @@ type Cache struct {
 	mux sync.Mutex
 }
 
+func NewCache(interval time.Duration) Cache {
+	return Cache{
+		pokeCache: make(map[string]cacheEntry)
+		mux: sync.Mutex()
+	}

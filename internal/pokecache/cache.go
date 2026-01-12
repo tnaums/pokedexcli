@@ -3,6 +3,7 @@ package pokecache
 import (
 	"sync"
 	"time"
+	"fmt"
 )
 
 type cacheEntry struct {
@@ -22,9 +23,22 @@ func NewCache(interval time.Duration) Cache {
 	}
 }
 
-func (c *Cache) Add(url string, val []byte)  {
-	newEntry := cacheEntry{time.Now(), val}
 
-	c.pokeCache[url] = newEntry
+func (c *Cache) Add(key string, value []byte) {
+    c.mux.Lock()
+    defer c.mux.Unlock()
+    c.pokeCache[key] = cacheEntry{
+        createdAt: time.Now().UTC(),
+        val:       value,
+    }
+	fmt.Println("Added to cache!")
+	
+}
+
+func (c *Cache) Get(url string) ([]byte, bool) {
+	dat, ok := c.pokeCache[url]
+	if ok {
+		return dat.val, true}
+	return dat.val, false
 }
 

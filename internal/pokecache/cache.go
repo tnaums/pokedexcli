@@ -21,3 +21,10 @@ func NewCache(interval time.Duration) Cache {
 		mux: sync.Mutex{},
 	}
 }
+
+func (c *Cache) Add(url string, val []byte)  {
+	newEntry := cacheEntry{time.Now(), val}
+
+	c.pokeCache[url] = newEntry
+}
+

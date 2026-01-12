@@ -3,49 +3,47 @@ package pokecache
 import (
 	"sync"
 	"time"
-	"fmt"
 )
+
+// Cache -
+type Cache struct {
+	cache map[string]cacheEntry
+	mux   *sync.Mutex
+}
 
 type cacheEntry struct {
 	createdAt time.Time
-	val []byte
+	val       []byte
 }
 
-type Cache struct {
-	pokeCache map[string]cacheEntry
-	mux sync.Mutex
-}
-
+// NewCache -
 func NewCache(interval time.Duration) Cache {
-	x := Cache{
-		pokeCache: make(map[string]cacheEntry),
-		mux: sync.Mutex{},
+	c := Cache{
+		cache: make(map[string]cacheEntry),
+		mux:   &sync.Mutex{},
 	}
-	go x.reapLoop(interval)
-	return x
+
+	go c.reapLoop(interval)
+
+	return c
 }
 
-
+// Add -
 func (c *Cache) Add(key string, value []byte) {
-    c.mux.Lock()
-    defer c.mux.Unlock()
-    c.pokeCache[key] = cacheEntry{
-        createdAt: time.Now().UTC(),
-        val:       value,
-    }
-	fmt.Println("Added to cache!")
-	
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.cache[key] = cacheEntry{
+		createdAt: time.Now().UTC(),
+		val:       value,
+	}
 }
 
-func (c *Cache) Get(url string) ([]byte, bool) {
+// Get -
+func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mux.Lock()
-	dat, ok := c.pokeCache[url]
-	c.mux.Unlock()
-	if ok {
-		fmt.Println("Found in cache!")
-		return dat.val, true}
-	fmt.Println("Nothing in cache!")
-	return dat.val, false
+	defer c.mux.Unlock()
+	val, ok := c.cache[key]
+	return val.val, ok
 }
 
 func (c *Cache) reapLoop(interval time.Duration) {
@@ -58,9 +56,9 @@ func (c *Cache) reapLoop(interval time.Duration) {
 func (c *Cache) reap(now time.Time, last time.Duration) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
-	for k, v := range c.pokeCache {
+	for k, v := range c.cache {
 		if v.createdAt.Before(now.Add(-last)) {
-			delete(c.pokeCache, k)
+			delete(c.cache, k)
 		}
 	}
 }

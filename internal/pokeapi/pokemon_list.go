@@ -1,7 +1,7 @@
 package pokeapi
 
 import (
-	//	"encoding/json"
+	"encoding/json"
 	"io"
 	"net/http"
 	"fmt"
@@ -27,5 +27,10 @@ func (c *Client) ListPokemon(location string) {
 	if err != nil {
 		return
 	}
-	fmt.Println(string(dat))
+
+	listPokemonResp := RespLocationArea{}
+	err = json.Unmarshal(dat, &listPokemonResp)
+
+	fmt.Println(listPokemonResp.PokemonEncounters[0].Pokemon.Name)
+	
 }

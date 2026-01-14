@@ -8,6 +8,7 @@ import (
 
 	"pokedexcli/internal/pokeapi"
 	"pokedexcli/internal/pokecache"
+	"pokedexcli/internal/dex"
 )
 
 type config struct {
@@ -15,6 +16,7 @@ type config struct {
 	nextLocationsURL *string
 	prevLocationsURL *string
 	pokemapCache pokecache.Cache
+	pokedex map[string]dex.Pokemon
 }
 
 func startRepl(cfg *config) {

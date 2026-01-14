@@ -4,33 +4,45 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"fmt"
 )
 
 //ListPokemon
-func (c *Client) ListPokemon(location string) {
+func (c *Client) ListPokemon(location string) (RespLocationArea, error){
 	url := "https://pokeapi.co/api/v2/location-area/" + location
-	fmt.Println(url)
 
+	if val, ok := c.cache.Get(url); ok {
+		listPokemonResp := RespLocationArea{}
+		err := json.Unmarshal(val, &listPokemonResp)
+		if err != nil {
+			return RespLocationArea{}, err
+		}
+
+		return listPokemonResp, nil
+	}
+	
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return
+		return RespLocationArea{}, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return
+		return RespLocationArea{}, err
 	}
 	defer resp.Body.Close()
 
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return
+		return RespLocationArea{}, err
 	}
 
 	listPokemonResp := RespLocationArea{}
 	err = json.Unmarshal(dat, &listPokemonResp)
+	if err != nil {
+		return RespLocationArea{}, err
+	}
 
-	fmt.Println(listPokemonResp.PokemonEncounters[0].Pokemon.Name)
+	c.cache.Add(url, dat)
+	return listPokemonResp, nil
 	
 }

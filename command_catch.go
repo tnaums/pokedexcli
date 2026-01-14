@@ -29,7 +29,6 @@ func commandCatch(cfg *config, pokemon string) error {
 }
 
 func shrinkStruct(pokemonData pokeapi.Catch) dex.Pokemon {
-	fmt.Println(pokemonData.BaseExperience)
 	statsStruct := dex.Stats{pokemonData.Stats[0].BaseStat, pokemonData.Stats[1].BaseStat, pokemonData.Stats[2].BaseStat, pokemonData.Stats[3].BaseStat, pokemonData.Stats[4].BaseStat, pokemonData.Stats[5].BaseStat}
 	embodimentsList := make([]string, 0)
 	for _, x := range pokemonData.Types{
